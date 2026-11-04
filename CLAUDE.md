@@ -20,13 +20,22 @@ No test framework is configured, so there are no tests to run.
 
 ## Architecture
 
-All application logic is in one component, `src/App.jsx`: the transaction list, form fields, filters, derived totals, and all rendering. `src/main.jsx` only mounts it inside `StrictMode`.
+`src/App.jsx` owns the `transactions` array and the `categories` list, and passes them to its child components as props. `src/main.jsx` only mounts `App` inside `StrictMode`.
 
-- **State:** local `useState` only. Transactions start from a hardcoded array and aren't persisted, so changes are lost on reload.
+- `Summary.jsx` calculates and displays the totals.
+- `TransactionForm.jsx` owns the form field state and sends each new transaction to `App` through `onAdd`.
+- `TransactionList.jsx` owns the filter state and renders the filters and table.
+
+Key behavior:
+
+- **State:** `useState` only. Transactions start from a hardcoded array and aren't persisted, so changes are lost on reload.
 - **Derived values:** totals and the filtered list are recalculated on each render rather than stored in state.
-- **Amounts are numbers:** `amount` is a number on every transaction. The form's `amount` state is a string because it holds the input's value, so `handleSubmit` converts it with `Number()` when creating a transaction.
-- **Styling:** plain CSS, with global base styles in `src/index.css` and app styles in `src/App.css`.
+- **Filters don't affect totals:** `Summary` receives the full `transactions` array, so its totals always cover every transaction. Filtering only changes the table.
+- **Amounts are numbers:** `amount` is a number on every transaction. The form's `amount` state is a string because it holds the input's value, so `handleSubmit` in `TransactionForm` converts it with `Number()` when creating a transaction.
+- **Styling:** plain CSS, with global base styles in `src/index.css` and app styles in `src/App.css`. `App.jsx` imports `App.css`, and its styles apply to all the child components.
+
+Known issue: the form accepts negative and zero amounts, and a negative expense lowers total expenses.
 
 ## Git remotes
 
-`origin` is the upstream course repo, and this account can't push to it (403). Push to `github-personal` (`jfergITLife/expense-tracker-starter`) and open PRs there.
+`origin` is the upstream course repo, and this account can't push to it (403). Push to `github-personal` (`jfergITLife/expense-tracker-starter`) and open PRs there. Local `main` still tracks `origin/main`, so name the remote explicitly when pushing or pulling `main`.
